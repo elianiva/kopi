@@ -32,7 +32,7 @@ const recipes = defineCollection({
 			updatedAt: z.date().optional(),
 			creator: z.string().optional(),
 			coffeeGram: z.number().int().positive().optional(),
-			waterTemp: z.number().int().min(60).max(100).optional(),
+			waterTemp: z.number().int().min(20).max(100).optional(),
 			roastLevel: z
 				.enum([
 					"light",
