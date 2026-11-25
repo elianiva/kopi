@@ -1,0 +1,123 @@
+---
+/**
+ * A coffee mark on the page. Drawn as inline SVG so it costs no requests.
+ * "ring" is the mark a wet mug leaves, "drip" a few dried drops,
+ * "puddle" a pale wash where a spill dried.
+ */
+interface Props {
+	kind?: "ring" | "drip" | "puddle";
+	size?: number;
+	top?: string;
+	left?: string;
+	right?: string;
+	bottom?: string;
+	rotate?: number;
+	opacity?: number;
+	seed?: number;
+}
+
+const {
+	kind = "ring",
+	size = 220,
+	top,
+	left,
+	right,
+	bottom,
+	rotate = 0,
+	opacity = 1,
+	seed = 1,
+} = Astro.props;
+const style = [
+	`width:${size}px`,
+	`height:${size}px`,
+	top && `top:${top}`,
+	left && `left:${left}`,
+	right && `right:${right}`,
+	bottom && `bottom:${bottom}`,
+	`transform:rotate(${rotate}deg)`,
+	`opacity:${opacity}`,
+]
+	.filter(Boolean)
+	.join(";");
+const f = `st-${kind}-${seed}`;
+---
+
+<svg class="stain" style={style} viewBox="0 0 200 200" aria-hidden="true">
+	<defs>
+		<filter id={f} x="-20%" y="-20%" width="140%" height="140%">
+			<feTurbulence
+				type="fractalNoise"
+				baseFrequency={kind === "drip" ? 0.09 : 0.035}
+				numOctaves="3"
+				seed={seed}
+			/>
+			<feDisplacementMap
+				in="SourceGraphic"
+				scale={kind === "ring" ? 9 : 14}
+			/>
+		</filter>
+		<radialGradient id={`${f}-wash`}>
+			<stop offset="0" stop-color="#8a5a2b" stop-opacity=".05"></stop>
+			<stop offset=".82" stop-color="#8a5a2b" stop-opacity=".12"></stop>
+			<stop offset=".97" stop-color="#6b3f1a" stop-opacity=".38"></stop>
+			<stop offset="1" stop-color="#6b3f1a" stop-opacity="0"></stop>
+		</radialGradient>
+	</defs>
+	<g filter={`url(#${f})`}>
+		{kind === "ring" && (
+			<>
+				<circle
+					cx="100"
+					cy="100"
+					r="78"
+					fill="none"
+					stroke="#7a4a20"
+					stroke-opacity=".28"
+					stroke-width="5"
+				/>
+				<circle
+					cx="100"
+					cy="100"
+					r="74"
+					fill="none"
+					stroke="#7a4a20"
+					stroke-opacity=".12"
+					stroke-width="9"
+				/>
+				<path
+					d="M30 112 A72 72 0 0 0 158 140"
+					fill="none"
+					stroke="#5e3514"
+					stroke-opacity=".3"
+					stroke-width="3"
+					stroke-dasharray="60 14 90 30"
+				/>
+			</>
+		)}
+		{kind === "puddle" && (
+			<path
+				d="M60 40 C110 20 170 50 165 100 C160 150 120 175 80 160 C40 148 25 110 35 80 C40 60 48 46 60 40Z"
+				fill={`url(#${f}-wash)`}
+			/>
+		)}
+		{kind === "drip" && (
+			<g fill="#6b3f1a">
+				<circle cx="70" cy="80" r="11" fill-opacity=".22" />
+				<circle cx="98" cy="64" r="4" fill-opacity=".3" />
+				<circle cx="120" cy="104" r="7" fill-opacity=".2" />
+				<circle cx="58" cy="120" r="3" fill-opacity=".35" />
+				<circle cx="140" cy="72" r="2.5" fill-opacity=".35" />
+				<circle cx="88" cy="140" r="5" fill-opacity=".18" />
+			</g>
+		)}
+	</g>
+</svg>
+
+<style>
+	.stain {
+		position: absolute;
+		pointer-events: none;
+		mix-blend-mode: multiply;
+		z-index: 0;
+	}
+</style>

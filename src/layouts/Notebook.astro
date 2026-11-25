@@ -1,0 +1,120 @@
+---
+import { Font } from "astro:assets";
+import "../styles/global.css";
+import Stain from "../components/Stain.astro";
+import { seed as hash } from "../lib/format";
+
+interface Props {
+	title: string;
+	description?: string;
+}
+
+const {
+	title,
+	description = "A handwritten log of the coffee I brew and the beans I buy.",
+} = Astro.props;
+const path = Astro.url.pathname.replace(/\/$/, "") || "/";
+const s = hash(path);
+const pick = (n: number, min: number, max: number) =>
+	min + ((s >> n) % (max - min + 1));
+
+const nav = [
+	{ href: "/", label: "Kopi" },
+	{ href: "/brews", label: "Brews" },
+	{ href: "/beans", label: "Beans" },
+	{ href: "/roasteries", label: "Roasteries" },
+];
+const current = (href: string) =>
+	href === "/" ? path === "/" : path.startsWith(href);
+---
+
+<!doctype html>
+<html lang="en">
+	<head>
+		<meta charset="utf-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1" />
+		<meta name="description" content={description} />
+		<meta name="theme-color" content="#2b1d14" />
+		<link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+		<title>{title === "Kopi" ? "Kopi" : `${title} · Kopi`}</title>
+		<Font cssVariable="--font-hand" preload={[{ weight: 400 }]} />
+		<Font cssVariable="--font-marker" preload />
+		<Font cssVariable="--font-type" />
+	</head>
+	<body>
+		<main class="page">
+			<div class="stains" aria-hidden="true">
+				<Stain
+					kind="ring"
+					size={pick(0, 190, 250)}
+					top={`${pick(3, -40, 10)}px`}
+					right={`${pick(5, -70, -20)}px`}
+					rotate={pick(7, 0, 359)}
+					seed={pick(2, 1, 40)}
+				/>
+				<Stain
+					kind="puddle"
+					size={pick(4, 220, 320)}
+					bottom={`${pick(6, 2, 18)}%`}
+					left={`${pick(8, -14, 6)}%`}
+					rotate={pick(9, 0, 359)}
+					opacity={0.8}
+					seed={pick(1, 1, 40)}
+				/>
+				<Stain
+					kind="drip"
+					size={140}
+					top={`${pick(10, 30, 60)}%`}
+					right={`${pick(11, 2, 14)}%`}
+					rotate={pick(12, 0, 359)}
+					seed={pick(13, 1, 40)}
+				/>
+			</div>
+
+			<nav class="nav" aria-label="Sections">
+				{nav.map((n) => (
+					<a
+						href={n.href}
+						aria-current={current(n.href) ? "page" : undefined}
+					>
+						{n.label}
+					</a>
+				))}
+			</nav>
+
+			<slot />
+		</main>
+	</body>
+</html>
+
+<style>
+	.nav {
+		display: flex;
+		gap: 1.4rem;
+		margin-bottom: var(--line);
+		font-family: var(--font-marker), cursive;
+		font-size: 1.35rem;
+	}
+
+	.nav a {
+		color: var(--ink-soft);
+		transition: color 0.15s;
+	}
+
+	.nav a:hover {
+		color: var(--ink);
+	}
+
+	.nav a[aria-current="page"] {
+		color: var(--red);
+		background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 200 8' preserveAspectRatio='none'%3E%3Cpath d='M1 5 C 30 2, 60 7, 95 4 S 160 2, 199 5' fill='none' stroke='%23a8322a' stroke-width='2' stroke-linecap='round'/%3E%3C/svg%3E");
+		background-repeat: no-repeat;
+		background-size: 100% 0.4em;
+		background-position: 0 95%;
+	}
+
+	.nav a:first-child {
+		margin-right: auto;
+		color: var(--sepia);
+	}
+</style>
