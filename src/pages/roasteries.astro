@@ -1,0 +1,81 @@
+---
+import Notebook from "../layouts/Notebook.astro";
+import { load } from "../lib/data";
+
+const { roasteries, beansOf, brewsOf } = await load();
+---
+
+<Notebook title="Roasteries">
+	<h1>Roasteries</h1>
+	{roasteries.map((r) => (
+		<section id={r.id}>
+			<h2>{r.data.name}</h2>
+			<p class="type where">
+				{r.data.city}, {r.data.country}
+			</p>
+			<ul class="beans">
+				{beansOf(r.id).map((bean) => (
+					<li>
+						<a href={`/beans/${bean.id}`}>{bean.data.name}</a>
+						<span class="origin">
+							{bean.data.country} · {bean.data.process}
+						</span>
+						<span class="cups">{brewsOf(bean.id).length} cups</span>
+					</li>
+				))}
+			</ul>
+		</section>
+	))}
+</Notebook>
+
+<style>
+	section {
+		scroll-margin-top: 1rem;
+	}
+
+	.where {
+		margin: 0;
+		line-height: var(--line);
+	}
+
+	.beans {
+		margin: 0 0 var(--line);
+		padding: 0 0 0 1.2rem;
+		list-style: "– ";
+	}
+
+	.beans li {
+		display: flex;
+		flex-wrap: wrap;
+		gap: 0 0.7rem;
+		align-items: baseline;
+	}
+
+	.beans a {
+		font-weight: 700;
+	}
+
+	.beans a:hover {
+		color: var(--red);
+	}
+
+	.origin {
+		color: var(--ink-soft);
+	}
+
+	.cups {
+		margin-left: auto;
+		color: var(--sepia);
+	}
+
+	section:target h2 {
+		background: linear-gradient(
+			100deg,
+			transparent 1%,
+			rgb(250 214 70 / 0.5) 3%,
+			rgb(250 214 70 / 0.4) 96%,
+			transparent 99%
+		);
+		width: fit-content;
+	}
+</style>

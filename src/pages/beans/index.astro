@@ -1,0 +1,20 @@
+---
+import Notebook from "../../layouts/Notebook.astro";
+import BeanCard from "../../components/BeanCard.astro";
+import { load } from "../../lib/data";
+
+const { beans, roasteryById, brewsOf } = await load();
+---
+
+<Notebook title="Beans">
+	<h1>Beans</h1>
+	<ul class="cards">
+		{beans.map((bean) => (
+			<BeanCard
+				bean={bean}
+				roastery={roasteryById.get(bean.data.roastery.id)!}
+				brews={brewsOf(bean.id).length}
+			/>
+		))}
+	</ul>
+</Notebook>

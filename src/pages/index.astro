@@ -1,16 +1,125 @@
 ---
+import Notebook from "../layouts/Notebook.astro";
+import BrewLine from "../components/BrewLine.astro";
+import BeanCard from "../components/BeanCard.astro";
+import { load } from "../lib/data";
+
+const { roasteries, beans, brews, roasteryById, beanById, brewsOf, beansOf } =
+	await load();
+const recent = brews.slice(0, 8);
+const origins = [...Map.groupBy(beans, (b) => b.data.country)].sort(
+	(a, b) => b[1].length - a[1].length,
+);
 ---
 
-<html lang="en">
-	<head>
-		<meta charset="utf-8" />
-		<link rel="icon" type="image/svg+xml" href="/favicon.svg" />
-		<link rel="icon" href="/favicon.ico" />
-		<meta name="viewport" content="width=device-width" />
-		<meta name="generator" content={Astro.generator} />
-		<title>Astro</title>
-	</head>
-	<body>
-		<h1>Astro</h1>
-	</body>
-</html>
+<Notebook title="Kopi">
+	<h1>Kopi</h1>
+	<p class="tally">
+		<span class="circled">{brews.length}</span> cups,{" "}
+		<span class="scribble">{beans.length} beans</span>
+		{` from ${roasteries.length} roasteries, ${origins.length} countries.`}
+	</p>
+
+	<section>
+		<div class="head">
+			<h2>Recent brews</h2>
+			<a class="more" href="/brews">
+				all brews →
+			</a>
+		</div>
+		<ol class="lines">
+			{recent.map((brew) => (
+				<BrewLine brew={brew} bean={beanById.get(brew.data.bean.id)!} />
+			))}
+		</ol>
+	</section>
+
+	<section>
+		<div class="head">
+			<h2>Beans I've tried</h2>
+			<a class="more" href="/beans">
+				all beans →
+			</a>
+		</div>
+		<ul class="cards">
+			{beans.slice(0, 4).map((bean) => (
+				<BeanCard
+					bean={bean}
+					roastery={roasteryById.get(bean.data.roastery.id)!}
+					brews={brewsOf(bean.id).length}
+				/>
+			))}
+		</ul>
+	</section>
+
+	<section class="split">
+		<div>
+			<div class="head">
+				<h2>Roasteries</h2>
+				<a class="more" href="/roasteries">
+					all →
+				</a>
+			</div>
+			<ul class="tick">
+				{roasteries.map((r) => (
+					<li>
+						<a href={`/roasteries#${r.id}`}>{r.data.name}</a>
+						<span class="n">×{beansOf(r.id).length}</span>
+					</li>
+				))}
+			</ul>
+		</div>
+		<div>
+			<h2>Origins</h2>
+			<ul class="tick">
+				{origins.map(([country, list]) => (
+					<li>
+						{country}
+						<span class="n">×{list.length}</span>
+					</li>
+				))}
+			</ul>
+		</div>
+	</section>
+</Notebook>
+
+<style>
+	.tally {
+		color: var(--ink-soft);
+	}
+
+	.split {
+		display: grid;
+		grid-template-columns: repeat(auto-fit, minmax(14rem, 1fr));
+		gap: 0 2rem;
+	}
+
+	/* A hand-drawn check before each item, like ticking off a list. */
+	.tick {
+		margin: 0 0 var(--line);
+		padding: 0;
+		list-style: none;
+	}
+
+	.tick li {
+		display: flex;
+		align-items: baseline;
+		gap: 0.5rem;
+	}
+
+	.tick li::before {
+		content: "✓";
+		color: var(--red);
+		font-weight: 700;
+		transform: rotate(-8deg);
+	}
+
+	.tick a:hover {
+		color: var(--red);
+	}
+
+	.n {
+		color: var(--pencil);
+		font-size: 0.95rem;
+	}
+</style>

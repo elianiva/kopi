@@ -1,0 +1,131 @@
+---
+import type { CollectionEntry } from "astro:content";
+import { seed } from "../lib/format";
+
+interface Props {
+	bean: CollectionEntry<"beans">;
+	roastery: CollectionEntry<"roasteries">;
+	brews: number;
+}
+
+const { bean, roastery, brews } = Astro.props;
+const d = bean.data;
+const s = seed(bean.id);
+const tilt = ((s % 7) - 3) * 0.6;
+const tapeTilt = ((s >> 3) % 11) - 5;
+// Tally marks in gates of five: four strokes, the fifth crosses them.
+const gates = Array.from({ length: Math.ceil(brews / 5) }, (_, i) =>
+	Math.min(5, brews - i * 5),
+);
+---
+
+<li class="card" style={`--tilt:${tilt}deg;--tape:${tapeTilt}deg`}>
+	<span class="tape" aria-hidden="true"></span>
+	<a href={`/beans/${bean.id}`}>
+		<span class="type">{roastery.data.name}</span>
+		<span class="name">{d.name}</span>
+		<span class="origin">
+			{d.country} · {d.process}
+		</span>
+		<span class="type meta">{d.tastingNotes.join(" · ")}</span>
+		<span class="tally" aria-label={`${brews} brews`}>
+			{gates.map((n) => (
+				<span class:list={["gate", { full: n === 5 }]}>
+					{"|".repeat(Math.min(n, 4))}
+				</span>
+			))}
+		</span>
+	</a>
+</li>
+
+<style>
+	.card {
+		position: relative;
+		list-style: none;
+		transform: rotate(var(--tilt));
+		transition: transform 0.2s ease;
+	}
+
+	.card:hover {
+		transform: rotate(0deg) translateY(-2px);
+	}
+
+	.tape {
+		top: -0.85rem;
+		left: 50%;
+		translate: -50% 0;
+		rotate: var(--tape);
+	}
+
+	/* A plain index card: white-ish stock, faint rules, a red header line. */
+	.card a {
+		position: relative;
+		display: flex;
+		flex-direction: column;
+		height: 100%;
+		padding: 1.1rem 1.1rem 0.8rem;
+		line-height: 1.6rem;
+		background-color: #fbf6e6;
+		background-image:
+			linear-gradient(
+				transparent 2.9rem,
+				rgb(196 72 62 / 0.45) 2.9rem,
+				rgb(196 72 62 / 0.45) calc(2.9rem + 1px),
+				transparent calc(2.9rem + 1px)
+			),
+			repeating-linear-gradient(
+				transparent 0 calc(1.6rem - 1px),
+				rgb(94 130 170 / 0.2) calc(1.6rem - 1px) 1.6rem
+			);
+		background-position:
+			0 0,
+			0 0.95rem;
+		box-shadow:
+			0 1px 1px rgb(60 35 15 / 0.2),
+			0 6px 14px rgb(60 35 15 / 0.22),
+			inset 0 0 30px rgb(150 105 50 / 0.12);
+		border-radius: 2px;
+	}
+
+	.name {
+		font-family: var(--font-marker), cursive;
+		font-size: 1.6rem;
+		line-height: 2.1rem;
+		color: var(--sepia);
+	}
+
+	.meta {
+		font-size: 0.7rem;
+		padding-right: 2.5rem;
+	}
+
+	/* One pen stroke per cup, the way you'd count on paper. */
+	.tally {
+		position: absolute;
+		right: 0.9rem;
+		bottom: 0.5rem;
+		font-family: var(--font-hand), cursive;
+		font-weight: 700;
+		letter-spacing: 0.08em;
+		color: var(--red);
+	}
+
+	.gate {
+		position: relative;
+		margin-left: 0.35em;
+	}
+
+	.gate.full::after {
+		content: "";
+		position: absolute;
+		left: -0.15em;
+		right: -0.1em;
+		top: 50%;
+		border-top: 2px solid currentColor;
+		transform: rotate(-24deg);
+	}
+
+	.card a:hover .name {
+		color: var(--red);
+	}
+</style>

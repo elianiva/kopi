@@ -1,0 +1,104 @@
+---
+import type { GetStaticPaths } from "astro";
+import Notebook from "../../layouts/Notebook.astro";
+import Facts from "../../components/Facts.astro";
+import BrewLine from "../../components/BrewLine.astro";
+import { load } from "../../lib/data";
+import { fmtDate } from "../../lib/format";
+
+export const getStaticPaths = (async () => {
+	const { beans, roasteryById, brewsOf } = await load();
+	return beans.map((bean) => ({
+		params: { id: bean.id },
+		props: {
+			bean,
+			roastery: roasteryById.get(bean.data.roastery.id)!,
+			brews: brewsOf(bean.id),
+		},
+	}));
+}) satisfies GetStaticPaths;
+
+const { bean, roastery, brews } = Astro.props;
+const d = bean.data;
+---
+
+<Notebook title={d.name}>
+	<a class="more back" href="/beans">
+		← beans
+	</a>
+	<h1>{d.name}</h1>
+	<p class="type">
+		<a class="roastery" href={`/roasteries#${roastery.id}`}>
+			{roastery.data.name}
+		</a>{" "}
+		· {roastery.data.city}
+	</p>
+
+	<Facts
+		rows={[
+			["Origin", [d.region, d.country].filter(Boolean).join(", ")],
+			["Producer", d.producer],
+			["Process", d.process],
+			["Varieties", d.varieties.join(", ")],
+			[
+				"Altitude",
+				d.altitude && `${d.altitude.toLocaleString("en-US")} masl`,
+			],
+			["Roast", d.roastLevel],
+			["Roaster", d.roastingMachine],
+			["Roasted", fmtDate(d.roastDate)],
+			["Harvest", d.harvest],
+			["Bag", `${d.weight} g`],
+		]}
+	/>
+
+	<h2>On the bag</h2>
+	<p class="notes">
+		{d.tastingNotes.map((n, i) => (
+			<>
+				<span class="note">{n}</span>
+				{i < d.tastingNotes.length - 1 && ", "}
+			</>
+		))}
+	</p>
+
+	<h2>Brews from this bag</h2>
+	{brews.length ? (
+		<ol class="lines">
+			{brews.map((brew) => (
+				<BrewLine brew={brew} bean={bean} />
+			))}
+		</ol>
+	) : (
+		<p class="empty">Not opened yet.</p>
+	)}
+</Notebook>
+
+<style>
+	.back {
+		display: inline-block;
+	}
+
+	.roastery:hover {
+		color: var(--red);
+	}
+
+	/* Highlighter marks over the roaster's tasting notes. */
+	.note {
+		padding: 0 0.15em;
+		background: linear-gradient(
+			100deg,
+			transparent 2%,
+			rgb(250 214 70 / 0.55) 4%,
+			rgb(250 214 70 / 0.45) 94%,
+			transparent 97%
+		);
+		border-radius: 0.3em 0.6em;
+		-webkit-box-decoration-break: clone;
+		box-decoration-break: clone;
+	}
+
+	.empty {
+		color: var(--pencil);
+	}
+</style>
