@@ -11,25 +11,45 @@ export default defineConfig({
 			provider: fontProviders.google(),
 			name: "Kalam",
 			cssVariable: "--font-hand",
-			weights: [300, 400, 700],
+			weights: [400, 700],
 			subsets: ["latin"],
 			fallbacks: ["cursive"],
 		},
+		// Google serves these two whole (about 52 KB each). The local files are
+		// subsets of the Google fonts with pyftsubset, limited to the ranges
+		// below. Special Elite only draws uppercased labels, so it has no
+		// lowercase. Characters outside a range fall back to the next font.
 		{
-			provider: fontProviders.google(),
+			provider: fontProviders.local(),
 			name: "Caveat Brush",
 			cssVariable: "--font-marker",
-			weights: [400],
-			subsets: ["latin"],
 			fallbacks: ["cursive"],
+			options: {
+				variants: [
+					{
+						src: ["./src/assets/fonts/caveat-brush.woff2"],
+						weight: 400,
+						style: "normal",
+						unicodeRange: ["U+0020-007E", "U+00B7", "U+00E9", "U+2019", "U+2026"],
+					},
+				],
+			},
 		},
 		{
-			provider: fontProviders.google(),
+			provider: fontProviders.local(),
 			name: "Special Elite",
 			cssVariable: "--font-type",
-			weights: [400],
-			subsets: ["latin"],
 			fallbacks: ["monospace"],
+			options: {
+				variants: [
+					{
+						src: ["./src/assets/fonts/special-elite.woff2"],
+						weight: 400,
+						style: "normal",
+						unicodeRange: ["U+0020-0060", "U+007B-007E", "U+00B0", "U+00B7", "U+2013-2014"],
+					},
+				],
+			},
 		},
 	],
 });
