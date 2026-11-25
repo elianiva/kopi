@@ -6,6 +6,10 @@ export default defineConfig({
 	// Every page is static HTML. Prefetch links as they scroll into view so
 	// the next page is already in cache when you tap it.
 	prefetch: { prefetchAll: true, defaultStrategy: "viewport" },
+	// Write brews.html instead of brews/index.html. Cloudflare then serves
+	// /brews directly instead of redirecting it to /brews/.
+	build: { format: "file" },
+	trailingSlash: "never",
 	fonts: [
 		{
 			provider: fontProviders.google(),
