@@ -1,16 +1,30 @@
 import * as Cloudflare from "@alchemy.run/cloudflare";
 import * as GitHub from "@alchemy.run/github";
 import * as Alchemy from "alchemy";
+import { Stage } from "alchemy/Stage";
 import * as Output from "alchemy/Output";
 import * as Effect from "effect/Effect";
 import * as Layer from "effect/Layer";
 
+const domain = "kopi.elianiva.my.id";
+
 // Every page is prerendered, so this deploys static assets only: no Worker
 // code runs per request. Cloudflare serves dist/404.html for unknown paths.
-export const Website = Cloudflare.Website.Astro("Website", {
-	astro: { output: "static" },
-	assets: { notFoundHandling: "404-page" },
-});
+// Only prod gets the custom domain; previews stay on workers.dev.
+export const Website = Cloudflare.Website.Astro(
+	"Website",
+	Effect.gen(function* () {
+		const prod = (yield* Stage) === "prod";
+		return {
+			astro: {
+				output: "static",
+				site: prod ? `https://${domain}` : undefined,
+			},
+			assets: { notFoundHandling: "404-page" },
+			domain: prod ? domain : undefined,
+		} as const;
+	}),
+);
 
 export default Alchemy.Stack(
 	"kopi",

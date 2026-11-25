@@ -24,7 +24,7 @@ bun run deploy --stage prod
 
 ### GitHub Actions
 
-`.github/workflows/deploy.yml` deploys `prod` on every push to `master`. Each pull request gets its own `pr-<number>` stage with the preview URL posted as a comment, and closing the pull request destroys that stage.
+`.github/workflows/deploy.yml` deploys `prod` to https://kopi.elianiva.my.id on every push to `master`. Each pull request gets its own `pr-<number>` stage with the preview URL posted as a comment, and closing the pull request destroys that stage.
 
 The workflow needs `CLOUDFLARE_API_TOKEN` and `CLOUDFLARE_ACCOUNT_ID` as repository secrets. `stacks/github.ts` mints a token scoped to this account and writes both secrets. Run it once with a profile that can create API tokens. Cloudflare OAuth can't, so use the Global API Key or a token with API Tokens Write:
 
