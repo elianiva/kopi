@@ -306,6 +306,11 @@ p {
 	h1 {
 		font-size: 2.3rem;
 	}
+
+	/* Keep the coffee ring in the corner, clear of the nav. */
+	.stains > .stain:first-child {
+		translate: 45% -45%;
+	}
 }
 
 @media (prefers-reduced-motion: no-preference) {

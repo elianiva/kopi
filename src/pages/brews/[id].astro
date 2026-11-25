@@ -29,14 +29,14 @@ const noteTilt = (seed(brew.id) % 5) - 1;
 	<a class="more back" href="/brews">
 		← brews
 	</a>
-	<h1>
-		{b.method} · {fmtDate(b.date)}
-	</h1>
+	<h1>{fmtDate(b.date)}</h1>
 	<p>
 		<a class="bean scribble" href={`/beans/${bean.id}`}>
 			{bean.data.name}
 		</a>
-		<span class="rest">{rest} days off roast</span>
+		<span class="rest">
+			{b.method.toLowerCase()}, {rest} days off roast
+		</span>
 	</p>
 
 	<Facts

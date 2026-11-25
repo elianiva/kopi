@@ -4,7 +4,8 @@ import { fmtShort, seed } from "../lib/format";
 
 interface Props {
 	brew: CollectionEntry<"brews">;
-	bean: CollectionEntry<"beans">;
+	/** Leave out on a bean's own page, where every line is the same bean. */
+	bean?: CollectionEntry<"beans">;
 }
 
 const { brew, bean } = Astro.props;
@@ -19,7 +20,7 @@ const tilt = ((seed(brew.id) % 9) - 4) / 10;
 			{fmtShort(b.date)}
 		</time>
 		<span class="what">
-			<span class="bean">{bean.data.name}</span>
+			{bean && <span class="bean">{bean.data.name}</span>}
 			<span class="gear">{b.gear}</span>
 		</span>
 		<span class="dose">
@@ -69,7 +70,11 @@ const tilt = ((seed(brew.id) % 9) - 4) / 10;
 		color: var(--sepia);
 	}
 
-	.brew a:hover .bean {
+	.gear:first-child {
+		color: inherit;
+	}
+
+	.brew a:hover .what > :first-child {
 		color: var(--red);
 	}
 
