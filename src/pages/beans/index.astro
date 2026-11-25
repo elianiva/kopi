@@ -6,7 +6,10 @@ import { load } from "../../lib/data";
 const { beans, roasteryById, brewsOf } = await load();
 ---
 
-<Notebook title="Beans">
+<Notebook
+	title="Beans"
+	description={`${beans.length} coffees I have tried, with origin, process, and tasting notes.`}
+>
 	<h1>Beans</h1>
 	<ul class="cards">
 		{beans.map((bean) => (

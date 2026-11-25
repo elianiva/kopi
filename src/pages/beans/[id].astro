@@ -22,7 +22,10 @@ const { bean, roastery, brews } = Astro.props;
 const d = bean.data;
 ---
 
-<Notebook title={d.name}>
+<Notebook
+	title={d.name}
+	description={`${d.name} from ${roastery.data.name}: ${d.process.toLowerCase()} ${d.country}, notes of ${d.tastingNotes.join(", ").toLowerCase()}.`}
+>
 	<a class="more back" href="/beans">
 		← beans
 	</a>

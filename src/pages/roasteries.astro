@@ -5,7 +5,10 @@ import { load } from "../lib/data";
 const { roasteries, beansOf, brewsOf } = await load();
 ---
 
-<Notebook title="Roasteries">
+<Notebook
+	title="Roasteries"
+	description={`${roasteries.length} roasteries I have bought from, and the beans I tried from each.`}
+>
 	<h1>Roasteries</h1>
 	{roasteries.map((r) => (
 		<section id={r.id}>

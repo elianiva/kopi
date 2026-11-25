@@ -1,8 +1,11 @@
 // @ts-check
 import { defineConfig, fontProviders } from "astro/config";
+import sitemap from "@astrojs/sitemap";
 
 // https://astro.build/config
 export default defineConfig({
+	site: "https://kopi.elianiva.com",
+	integrations: [sitemap()],
 	// Every page is static HTML. Prefetch links as they scroll into view so
 	// the next page is already in cache when you tap it.
 	prefetch: { prefetchAll: true, defaultStrategy: "viewport" },
@@ -34,7 +37,13 @@ export default defineConfig({
 						src: ["./src/assets/fonts/caveat-brush.woff2"],
 						weight: 400,
 						style: "normal",
-						unicodeRange: ["U+0020-007E", "U+00B7", "U+00E9", "U+2019", "U+2026"],
+						unicodeRange: [
+							"U+0020-007E",
+							"U+00B7",
+							"U+00E9",
+							"U+2019",
+							"U+2026",
+						],
 					},
 				],
 			},
@@ -50,7 +59,13 @@ export default defineConfig({
 						src: ["./src/assets/fonts/special-elite.woff2"],
 						weight: 400,
 						style: "normal",
-						unicodeRange: ["U+0020-0060", "U+007B-007E", "U+00B0", "U+00B7", "U+2013-2014"],
+						unicodeRange: [
+							"U+0020-0060",
+							"U+007B-007E",
+							"U+00B0",
+							"U+00B7",
+							"U+2013-2014",
+						],
 					},
 				],
 			},

@@ -25,7 +25,10 @@ const tastes = [
 const noteTilt = (seed(brew.id) % 5) - 1;
 ---
 
-<Notebook title={`${bean.data.name} · ${fmtDate(b.date)}`}>
+<Notebook
+	title={`${bean.data.name} · ${fmtDate(b.date)}`}
+	description={`${bean.data.name} brewed with a ${b.gear}: ${b.dose} g to ${b.water} g at ${b.waterTemp} °C, ${b.brewTime}.${b.taste.hot ? ` Tasted ${b.taste.hot.toLowerCase()}.` : ""}`}
+>
 	<a class="more back" href="/brews">
 		← brews
 	</a>

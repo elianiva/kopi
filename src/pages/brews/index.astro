@@ -15,7 +15,10 @@ const months = Map.groupBy(brews, (b) =>
 );
 ---
 
-<Notebook title="Brews">
+<Notebook
+	title="Brews"
+	description={`Every cup I have brewed, ${brews.length} so far, with dose, water, and gear.`}
+>
 	<h1>Brews</h1>
 	{[...months].map(([month, list]) => (
 		<section>
