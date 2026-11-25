@@ -1,0 +1,41 @@
+---
+interface Props {
+	rows: [label: string, value: string | number | undefined][];
+}
+
+const rows = Astro.props.rows.filter(([, v]) => v !== undefined && v !== "");
+---
+
+<dl class="facts">
+	{rows.map(([label, value]) => (
+		<div>
+			<dt class="type">{label}</dt>
+			<dd>{value}</dd>
+		</div>
+	))}
+</dl>
+
+<style>
+	.facts {
+		display: grid;
+		grid-template-columns: repeat(auto-fill, minmax(13rem, 1fr));
+		gap: 0 1.5rem;
+		margin: 0 0 var(--line);
+	}
+
+	.facts div {
+		display: flex;
+		align-items: baseline;
+		gap: 0.6rem;
+		min-height: var(--line);
+	}
+
+	dt {
+		flex: none;
+		font-size: 0.7rem;
+	}
+
+	dd {
+		margin: 0;
+	}
+</style>

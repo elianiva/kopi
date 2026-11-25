@@ -1,0 +1,89 @@
+---
+import type { CollectionEntry } from "astro:content";
+import { fmtShort, seed } from "../lib/format";
+
+interface Props {
+	brew: CollectionEntry<"brews">;
+	bean: CollectionEntry<"beans">;
+}
+
+const { brew, bean } = Astro.props;
+const b = brew.data;
+// Nobody writes perfectly level. Each line leans its own way.
+const tilt = ((seed(brew.id) % 9) - 4) / 10;
+---
+
+<li class="brew" style={`--tilt:${tilt}deg`}>
+	<a href={`/brews/${brew.id}`}>
+		<time class="when" datetime={b.date.toISOString().slice(0, 10)}>
+			{fmtShort(b.date)}
+		</time>
+		<span class="what">
+			<span class="bean">{bean.data.name}</span>
+			<span class="gear">{b.gear}</span>
+		</span>
+		<span class="dose">
+			{b.dose}g : {b.water}g
+		</span>
+	</a>
+</li>
+
+<style>
+	.brew a {
+		display: grid;
+		grid-template-columns: 1fr auto;
+		align-items: baseline;
+		gap: 0 1rem;
+		min-height: var(--line);
+		transform: rotate(var(--tilt));
+	}
+
+	/* The date sits in the margin, in red pencil. */
+	.when {
+		position: absolute;
+		right: calc(100% + 1.45rem);
+		white-space: nowrap;
+		font-family: var(--font-hand), cursive;
+		font-weight: 300;
+		font-size: 0.92rem;
+		color: var(--red);
+		opacity: 0.85;
+	}
+
+	.what {
+		display: flex;
+		flex-wrap: wrap;
+		gap: 0 0.6rem;
+		min-width: 0;
+	}
+
+	.bean {
+		font-weight: 700;
+	}
+
+	.gear {
+		color: var(--ink-soft);
+	}
+
+	.dose {
+		white-space: nowrap;
+		color: var(--sepia);
+	}
+
+	.brew a:hover .bean {
+		color: var(--red);
+	}
+
+	@media (max-width: 34rem) {
+		.when {
+			position: static;
+			grid-column: 1 / -1;
+			line-height: 1.2;
+			margin-top: 0.4rem;
+		}
+
+		.gear {
+			font-size: 0.95rem;
+		}
+	}
+</style>

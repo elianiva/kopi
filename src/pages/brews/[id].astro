@@ -1,0 +1,207 @@
+---
+import type { GetStaticPaths } from "astro";
+import Notebook from "../../layouts/Notebook.astro";
+import Facts from "../../components/Facts.astro";
+import { load } from "../../lib/data";
+import { daysBetween, fmtDate, ratio, seed } from "../../lib/format";
+
+export const getStaticPaths = (async () => {
+	const { brews, beanById } = await load();
+	return brews.map((brew) => ({
+		params: { id: brew.id },
+		props: { brew, bean: beanById.get(brew.data.bean.id)! },
+	}));
+}) satisfies GetStaticPaths;
+
+const { brew, bean } = Astro.props;
+const b = brew.data;
+const rest = daysBetween(bean.data.roastDate, b.date);
+const tastes = [
+	["Fragrance, dry", b.taste.fragrance],
+	["Aroma, wet", b.taste.aroma],
+	["Hot", b.taste.hot],
+	["Warm", b.taste.warm],
+].filter(([, v]) => v) as [string, string][];
+const noteTilt = (seed(brew.id) % 5) - 1;
+---
+
+<Notebook title={`${bean.data.name} · ${fmtDate(b.date)}`}>
+	<a class="more back" href="/brews">
+		← brews
+	</a>
+	<h1>
+		{b.method} · {fmtDate(b.date)}
+	</h1>
+	<p>
+		<a class="bean scribble" href={`/beans/${bean.id}`}>
+			{bean.data.name}
+		</a>
+		<span class="rest">{rest} days off roast</span>
+	</p>
+
+	<Facts
+		rows={[
+			["Dose", `${b.dose} g`],
+			["Water", `${b.water} g · ${ratio(b.dose, b.water)}`],
+			["Temp", `${b.waterTemp} °C`],
+			["Time", b.brewTime],
+			["Gear", b.gear],
+			["Filter", b.filter],
+			["Grinder", b.grinder],
+			["Grind", b.grindSize],
+			[
+				"Brand",
+				b.waterBrand &&
+					`${b.waterBrand}${b.waterPpm ? `, ${b.waterPpm} ppm` : ""}`,
+			],
+			["Pour", b.pourSpeed && `${b.pourSpeed} g/s`],
+		]}
+	/>
+
+	<h2>Pours</h2>
+	<ol class="pours">
+		{b.pours.map((p) => (
+			<li style={`--w:${(p.to / b.water) * 100}%`}>
+				<span class="at">{p.at}</span>
+				<span class="bar" aria-hidden="true" />
+				<span class="to">{p.to} g</span>
+			</li>
+		))}
+	</ol>
+
+	<h2>Taste</h2>
+	<dl class="taste">
+		{tastes.map(([k, v]) => (
+			<div>
+				<dt class="type">{k}</dt>
+				<dd>{v}</dd>
+			</div>
+		))}
+	</dl>
+
+	{b.nextTime && (
+		<aside class="sticky" style={`--r:${noteTilt}deg`}>
+			<span class="tape" aria-hidden="true" />
+			<strong>Next time</strong>
+			<p>{b.nextTime}</p>
+		</aside>
+	)}
+</Notebook>
+
+<style>
+	.back {
+		display: inline-block;
+	}
+
+	.bean {
+		font-weight: 700;
+		color: var(--sepia);
+	}
+
+	.bean:hover {
+		color: var(--red);
+	}
+
+	.rest {
+		margin-left: 0.5rem;
+		color: var(--pencil);
+		font-weight: 300;
+	}
+
+	.pours {
+		list-style: none;
+		margin: 0 0 var(--line);
+		padding: 0;
+	}
+
+	.pours li {
+		display: grid;
+		grid-template-columns: 3.4rem 1fr 3.5rem;
+		align-items: center;
+		gap: 0.75rem;
+		height: var(--line);
+	}
+
+	.at {
+		color: var(--red);
+		font-weight: 300;
+	}
+
+	.to {
+		text-align: right;
+		color: var(--sepia);
+	}
+
+	/* Pencil hatching that fills up as the kettle empties. */
+	.bar {
+		width: var(--w);
+		height: 0.65rem;
+		background: repeating-linear-gradient(
+			-60deg,
+			rgb(91 58 30 / 0.65) 0 1.5px,
+			transparent 1.5px 5px
+		);
+		border: 1.5px solid rgb(91 58 30 / 0.7);
+		border-radius: 3px 8px 4px 6px / 6px 3px 7px 4px;
+	}
+
+	.taste {
+		margin: 0 0 var(--line);
+	}
+
+	.taste div {
+		display: grid;
+		grid-template-columns: 8.5rem 1fr;
+		align-items: baseline;
+	}
+
+	.taste dt {
+		font-size: 0.7rem;
+	}
+
+	.taste dd {
+		margin: 0;
+	}
+
+	.sticky {
+		position: relative;
+		width: min(17rem, 100%);
+		margin: calc(var(--line) * 1.5) 0 var(--line) auto;
+		padding: 1.4rem 1.2rem 0.9rem;
+		line-height: 1.6rem;
+		background: linear-gradient(170deg, #f7e27a, #f1d45f 70%, #e8c84f);
+		color: #3b2f12;
+		transform: rotate(var(--r));
+		box-shadow:
+			0 12px 14px -8px rgb(60 35 10 / 0.45),
+			inset 0 -10px 18px -12px rgb(120 80 0 / 0.35);
+	}
+
+	.sticky .tape {
+		top: -0.9rem;
+		left: 30%;
+		rotate: -4deg;
+	}
+
+	.sticky strong {
+		font-family: var(--font-marker), cursive;
+		font-weight: 400;
+		font-size: 1.3rem;
+		color: var(--red);
+	}
+
+	.sticky p {
+		margin: 0.2rem 0 0;
+	}
+
+	@media (max-width: 34rem) {
+		.taste div {
+			grid-template-columns: 1fr;
+		}
+
+		.taste dt {
+			line-height: 1.2;
+			margin-top: 0.4rem;
+		}
+	}
+</style>

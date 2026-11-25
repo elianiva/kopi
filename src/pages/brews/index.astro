@@ -1,0 +1,41 @@
+---
+import Notebook from "../../layouts/Notebook.astro";
+import BrewLine from "../../components/BrewLine.astro";
+import { load } from "../../lib/data";
+
+const { brews, beanById } = await load();
+
+// Group by month, like flipping back through the pages of a diary.
+const months = Map.groupBy(brews, (b) =>
+	b.data.date.toLocaleDateString("en-GB", {
+		month: "long",
+		year: "numeric",
+		timeZone: "UTC",
+	}),
+);
+---
+
+<Notebook title="Brews">
+	<h1>Brews</h1>
+	{[...months].map(([month, list]) => (
+		<section>
+			<h2>
+				{month} <span class="type count">{list.length} cups</span>
+			</h2>
+			<ol class="lines">
+				{list.map((brew) => (
+					<BrewLine
+						brew={brew}
+						bean={beanById.get(brew.data.bean.id)!}
+					/>
+				))}
+			</ol>
+		</section>
+	))}
+</Notebook>
+
+<style>
+	.count {
+		margin-left: 0.5rem;
+	}
+</style>
