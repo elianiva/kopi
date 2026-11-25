@@ -1,0 +1,343 @@
+---
+import Notebook from "../layouts/Notebook.astro";
+import { load } from "../lib/data";
+import { fmtShort } from "../lib/format";
+
+const { brews, beanById, roasteryById } = await load();
+const asc = [...brews].reverse();
+
+// Cups per week, Monday to Sunday, including empty weeks.
+const DAY = 86_400_000;
+const monday = (d: Date) =>
+	new Date(d.getTime() - ((d.getUTCDay() + 6) % 7) * DAY);
+const first = monday(asc[0].data.date);
+const last = monday(asc.at(-1)!.data.date);
+const weeks: { start: Date; cups: number }[] = [];
+for (let t = first.getTime(); t <= last.getTime(); t += 7 * DAY)
+	weeks.push({ start: new Date(t), cups: 0 });
+for (const b of asc)
+	weeks[
+		Math.floor(
+			(monday(b.data.date).getTime() - first.getTime()) / (7 * DAY),
+		)
+	].cups++;
+const maxCups = Math.max(...weeks.map((w) => w.cups));
+
+// Ratio (water per gram of coffee) for each brew in order.
+const ratios = asc.map((b) => b.data.water / b.data.dose);
+const lo = Math.floor(Math.min(...ratios) * 2) / 2;
+const hi = Math.ceil(Math.max(...ratios) * 2) / 2;
+
+const count = <T,>(items: T[]) =>
+	[...Map.groupBy(items, (x) => x)]
+		.map(([k, v]) => [k, v.length] as const)
+		.sort((a, b) => b[1] - a[1]);
+const byRoastery = count(
+	asc.map(
+		(b) =>
+			roasteryById.get(beanById.get(b.data.bean.id)!.data.roastery.id)!
+				.data.name,
+	),
+);
+const byGear = count(asc.map((b) => b.data.gear));
+
+const grams = asc.reduce((s, b) => s + b.data.dose, 0);
+const avgRatio = ratios.reduce((s, r) => s + r, 0) / ratios.length;
+const avgDose = grams / asc.length;
+
+// Chart geometry, in SVG units.
+const W = 560;
+const H = 170;
+const pad = { l: 28, r: 8, t: 10, b: 26 };
+const iw = W - pad.l - pad.r;
+const ih = H - pad.t - pad.b;
+const bw = iw / weeks.length;
+const x = (i: number) => pad.l + (i + 0.5) * (iw / ratios.length);
+const y = (r: number) => pad.t + ih - ((r - lo) / (hi - lo)) * ih;
+const line = ratios
+	.map((r, i) => `${i ? "L" : "M"}${x(i).toFixed(1)} ${y(r).toFixed(1)}`)
+	.join(" ");
+const ticks = Array.from(
+	{ length: Math.round((hi - lo) / 0.5) + 1 },
+	(_, i) => lo + i * 0.5,
+);
+---
+
+<Notebook title="Stats">
+	<h1>Stats</h1>
+	<p class="totals">
+		<span class="circled">{asc.length}</span>
+		{` cups since ${fmtShort(asc[0].data.date)}, `}
+		<span class="scribble">{(grams / 1000).toFixed(2)} kg</span>
+		{` ground, ${avgDose.toFixed(1)} g a cup at 1:${avgRatio.toFixed(1)} on average.`}
+	</p>
+
+	<svg width="0" height="0" aria-hidden="true" class="defs">
+		<defs>
+			<!-- Shakes every line a little, like a pencil without a ruler. -->
+			<filter id="pencil" x="-5%" y="-5%" width="110%" height="110%">
+				<feTurbulence
+					type="fractalNoise"
+					baseFrequency="0.04"
+					numOctaves="2"
+					seed="3"
+				></feTurbulence>
+				<feDisplacementMap
+					in="SourceGraphic"
+					scale="2.6"
+				></feDisplacementMap>
+			</filter>
+			<pattern
+				id="hatch"
+				width="5"
+				height="5"
+				patternUnits="userSpaceOnUse"
+				patternTransform="rotate(-60)"
+			>
+				<line
+					x1="0"
+					y1="0"
+					x2="0"
+					y2="5"
+					stroke="#5b3a1e"
+					stroke-opacity=".65"
+					stroke-width="1.6"
+				></line>
+			</pattern>
+		</defs>
+	</svg>
+
+	<h2>Cups a week</h2>
+	<figure>
+		<svg
+			viewBox={`0 0 ${W} ${H}`}
+			role="img"
+			aria-label="Bar chart of cups brewed each week"
+		>
+			<g filter="url(#pencil)">
+				<path
+					d={`M${pad.l} ${pad.t + ih} H${W - pad.r}`}
+					class="axis"
+				></path>
+				{weeks.map((w, i) => {
+					const h = (w.cups / maxCups) * ih;
+					return (
+						<>
+							{w.cups > 0 && (
+								<rect
+									x={pad.l + i * bw + bw * 0.18}
+									y={pad.t + ih - h}
+									width={bw * 0.64}
+									height={h}
+									fill="url(#hatch)"
+									class="bar"
+									rx="2"
+								/>
+							)}
+							<text
+								x={pad.l + (i + 0.5) * bw}
+								y={pad.t + ih - h - 5}
+								class="val"
+							>
+								{w.cups || ""}
+							</text>
+							<text
+								x={pad.l + (i + 0.5) * bw}
+								y={H - 6}
+								class="lbl"
+							>
+								{fmtShort(w.start)}
+							</text>
+						</>
+					);
+				})}
+			</g>
+		</svg>
+	</figure>
+
+	<h2>Ratio over time</h2>
+	<figure>
+		<svg
+			viewBox={`0 0 ${W} ${H}`}
+			role="img"
+			aria-label={`Line chart of brew ratio, from 1:${lo} to 1:${hi}`}
+		>
+			<g filter="url(#pencil)">
+				{ticks.map((t) => (
+					<>
+						<path
+							d={`M${pad.l} ${y(t)} H${W - pad.r}`}
+							class="grid"
+						/>
+						<text x={pad.l - 6} y={y(t) + 4} class="tick">
+							{t % 1 === 0 ? t : ""}
+						</text>
+					</>
+				))}
+				<path d={line} class="trend"></path>
+				{ratios.map((r, i) => (
+					<circle cx={x(i)} cy={y(r)} r="2.6" class="dot" />
+				))}
+				<text x={pad.l} y={H - 6} class="lbl start">
+					{fmtShort(asc[0].data.date)}
+				</text>
+				<text x={W - pad.r} y={H - 6} class="lbl end">
+					{fmtShort(asc.at(-1)!.data.date)}
+				</text>
+			</g>
+		</svg>
+	</figure>
+
+	<div class="split">
+		<section>
+			<h2>By roastery</h2>
+			<ul class="bars">
+				{byRoastery.map(([name, n]) => (
+					<li style={`--w:${(n / byRoastery[0][1]) * 100}%`}>
+						<span class="name">{name}</span>
+						<span class="bar" aria-hidden="true" />
+						<span class="n">{n}</span>
+					</li>
+				))}
+			</ul>
+		</section>
+		<section>
+			<h2>By gear</h2>
+			<ul class="bars">
+				{byGear.map(([name, n]) => (
+					<li style={`--w:${(n / byGear[0][1]) * 100}%`}>
+						<span class="name">{name}</span>
+						<span class="bar" aria-hidden="true" />
+						<span class="n">{n}</span>
+					</li>
+				))}
+			</ul>
+		</section>
+	</div>
+</Notebook>
+
+<style>
+	.totals {
+		color: var(--ink-soft);
+	}
+
+	.defs {
+		position: absolute;
+	}
+
+	figure {
+		margin: calc(var(--line) * 0.5) 0 var(--line);
+	}
+
+	figure svg {
+		display: block;
+		width: 100%;
+		height: auto;
+		overflow: visible;
+	}
+
+	.axis,
+	.grid,
+	.trend {
+		fill: none;
+		stroke-linecap: round;
+	}
+
+	.axis {
+		stroke: rgb(91 58 30 / 0.7);
+		stroke-width: 1.5;
+	}
+
+	.grid {
+		stroke: rgb(91 58 30 / 0.18);
+		stroke-dasharray: 3 5;
+	}
+
+	.bar {
+		stroke: rgb(91 58 30 / 0.75);
+		stroke-width: 1.4;
+	}
+
+	.trend {
+		stroke: var(--ink);
+		stroke-width: 1.6;
+		stroke-linejoin: round;
+	}
+
+	.dot {
+		fill: var(--red);
+	}
+
+	text {
+		font-family: var(--font-hand), cursive;
+		fill: var(--pencil);
+	}
+
+	.val {
+		font-size: 13px;
+		text-anchor: middle;
+		fill: var(--sepia);
+	}
+
+	.lbl {
+		font-size: 11px;
+		text-anchor: middle;
+	}
+
+	.lbl.start {
+		text-anchor: start;
+	}
+
+	.lbl.end {
+		text-anchor: end;
+	}
+
+	.tick {
+		font-size: 11px;
+		text-anchor: end;
+	}
+
+	.split {
+		display: grid;
+		grid-template-columns: repeat(auto-fit, minmax(15rem, 1fr));
+		gap: 0 2rem;
+	}
+
+	.bars {
+		margin: 0 0 var(--line);
+		padding: 0;
+		list-style: none;
+	}
+
+	.bars li {
+		display: grid;
+		grid-template-columns: 1fr 1.5rem;
+		grid-template-areas: "name n" "bar bar";
+		align-items: baseline;
+	}
+
+	.bars .name {
+		grid-area: name;
+	}
+
+	.bars .n {
+		grid-area: n;
+		text-align: right;
+		color: var(--sepia);
+	}
+
+	/* Same pencil hatching as the pour bars on a brew page. */
+	.bars .bar {
+		grid-area: bar;
+		width: var(--w);
+		height: 0.55rem;
+		margin-bottom: 0.55rem;
+		background: repeating-linear-gradient(
+			-60deg,
+			rgb(91 58 30 / 0.6) 0 1.5px,
+			transparent 1.5px 5px
+		);
+		border: 1.5px solid rgb(91 58 30 / 0.65);
+		border-radius: 3px 8px 4px 6px / 6px 3px 7px 4px;
+	}
+</style>

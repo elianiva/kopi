@@ -23,6 +23,7 @@ const nav = [
 	{ href: "/brews", label: "Brews" },
 	{ href: "/beans", label: "Beans" },
 	{ href: "/roasteries", label: "Roasteries" },
+	{ href: "/stats", label: "Stats" },
 ];
 const current = (href: string) =>
 	href === "/" ? path === "/" : path.startsWith(href);
@@ -116,5 +117,12 @@ const current = (href: string) =>
 	.nav a:first-child {
 		margin-right: auto;
 		color: var(--sepia);
+	}
+
+	@media (max-width: 34rem) {
+		.nav {
+			gap: 0.85rem;
+			font-size: 1.15rem;
+		}
 	}
 </style>
