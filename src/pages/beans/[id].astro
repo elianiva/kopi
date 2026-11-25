@@ -65,6 +65,12 @@ const d = bean.data;
 		))}
 	</p>
 
+	{d.note && (
+		<p>
+			<span class="type">Note</span> {d.note}
+		</p>
+	)}
+
 	<h2>Brews from this bag</h2>
 	{brews.length ? (
 		<ol class="lines">

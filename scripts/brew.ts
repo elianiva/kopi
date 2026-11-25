@@ -102,10 +102,13 @@ for (;;) {
 	console.log(`  The last pour should reach the water weight, ${water} g.`);
 }
 
+const note = await ask("Note", prev.note);
 const fragrance = await ask("Fragrance, dry");
 const aroma = await ask("Aroma, wet");
 const hot = await ask("Taste hot");
 const warm = await ask("Taste warm");
+const aftertaste = await ask("Aftertaste");
+const mouthfeel = await ask("Mouthfeel");
 const nextTime = await ask("Next time");
 rl.close();
 
@@ -126,6 +129,9 @@ if (
 }
 
 const id = String(Math.max(0, ...brews.map((b) => Number(b.id) || 0)) + 1);
+const hasTaste = Boolean(
+	fragrance || aroma || hot || warm || aftertaste || mouthfeel,
+);
 // JSON strings are valid YAML, so quoting through JSON escapes anything odd.
 const q = (s: string) => JSON.stringify(s);
 const opt = (key: string, v: string | number | undefined, indent = "  ") =>
@@ -147,11 +153,14 @@ const entry =
 	opt("filter", filter) +
 	opt("pourSpeed", pourSpeed) +
 	`  pours:\n${pours.map((p) => `    - { at: ${q(p.at)}, to: ${p.to} }\n`).join("")}` +
-	`  taste:${fragrance || aroma || hot || warm ? "\n" : " {}\n"}` +
+	opt("note", note) +
+	`  taste:${hasTaste ? "\n" : " {}\n"}` +
 	opt("fragrance", fragrance, "    ") +
 	opt("aroma", aroma, "    ") +
 	opt("hot", hot, "    ") +
 	opt("warm", warm, "    ") +
+	opt("aftertaste", aftertaste, "    ") +
+	opt("mouthfeel", mouthfeel, "    ") +
 	opt("nextTime", nextTime);
 
 await appendFile(BREWS, entry);

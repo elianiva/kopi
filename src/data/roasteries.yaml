@@ -1,25 +1,4 @@
-# Dummy data. Replace with real roasteries.
-- id: tanah
-  name: Tanah Roastery
-  city: Jakarta
-  country: Indonesia
-
-- id: pagi
-  name: Pagi Coffee Works
-  city: Bandung
-  country: Indonesia
-
-- id: lereng
-  name: Lereng Roasters
-  city: Yogyakarta
-  country: Indonesia
-
-- id: sela
-  name: Sela Coffee
-  city: Makassar
-  country: Indonesia
-
-- id: hutan-kopi
-  name: Hutan Kopi
-  city: Bandung
+- id: series
+  name: Series Coffee Roasters
+  city: Sanur
   country: Indonesia

@@ -2,6 +2,7 @@
 import Notebook from "../../layouts/Notebook.astro";
 import BrewLine from "../../components/BrewLine.astro";
 import { load } from "../../lib/data";
+import { plural } from "../../lib/format";
 
 const { brews, beanById } = await load();
 
@@ -23,7 +24,8 @@ const months = Map.groupBy(brews, (b) =>
 	{[...months].map(([month, list]) => (
 		<section>
 			<h2>
-				{month} <span class="type count">{list.length} cups</span>
+				{month}{" "}
+				<span class="type count">{plural(list.length, "cup")}</span>
 			</h2>
 			<ol class="lines">
 				{list.map((brew) => (

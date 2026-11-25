@@ -2,13 +2,14 @@
 import Notebook from "../../layouts/Notebook.astro";
 import BeanCard from "../../components/BeanCard.astro";
 import { load } from "../../lib/data";
+import { plural } from "../../lib/format";
 
 const { beans, roasteryById, brewsOf } = await load();
 ---
 
 <Notebook
 	title="Beans"
-	description={`${beans.length} coffees I have tried, with origin, process, and tasting notes.`}
+	description={`${plural(beans.length, "coffee", "coffees")} I have tried, with origin, process, and tasting notes.`}
 >
 	<h1>Beans</h1>
 	<ul class="cards">

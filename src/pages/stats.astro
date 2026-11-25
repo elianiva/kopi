@@ -1,7 +1,7 @@
 ---
 import Notebook from "../layouts/Notebook.astro";
 import { load } from "../lib/data";
-import { fmtShort } from "../lib/format";
+import { fmtShort, plural } from "../lib/format";
 
 const { brews, beanById, roasteryById } = await load();
 const asc = [...brews].reverse();
@@ -26,7 +26,7 @@ const maxCups = Math.max(...weeks.map((w) => w.cups));
 // Ratio (water per gram of coffee) for each brew in order.
 const ratios = asc.map((b) => b.data.water / b.data.dose);
 const lo = Math.floor(Math.min(...ratios) * 2) / 2;
-const hi = Math.ceil(Math.max(...ratios) * 2) / 2;
+const hi = Math.max(Math.ceil(Math.max(...ratios) * 2) / 2, lo + 0.5);
 
 const count = <T,>(items: T[]) =>
 	[...Map.groupBy(items, (x) => x)]
@@ -65,12 +65,12 @@ const ticks = Array.from(
 
 <Notebook
 	title="Stats"
-	description={`${asc.length} cups in charts: cups a week, brew ratio over time, and cups by roastery and gear.`}
+	description={`${plural(asc.length, "cup")} in charts: cups a week, brew ratio over time, and cups by roastery and gear.`}
 >
 	<h1>Stats</h1>
 	<p class="totals">
 		<span class="circled">{asc.length}</span>
-		{` cups since ${fmtShort(asc[0].data.date)}, `}
+		{` ${asc.length === 1 ? "cup" : "cups"} since ${fmtShort(asc[0].data.date)}, `}
 		<span class="scribble">{(grams / 1000).toFixed(2)} kg</span>
 		{` ground, ${avgDose.toFixed(1)} g a cup at 1:${avgRatio.toFixed(1)} on average.`}
 	</p>

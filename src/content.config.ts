@@ -28,6 +28,7 @@ const beans = defineCollection({
 		harvest: z.string().optional(),
 		weight: z.number(),
 		tastingNotes: z.array(z.string()),
+		note: z.string().optional(),
 	}),
 });
 
@@ -49,11 +50,14 @@ const brews = defineCollection({
 		filter: z.string().optional(),
 		pourSpeed: z.number().optional(),
 		pours: z.array(z.object({ at: z.string(), to: z.number() })),
+		note: z.string().optional(),
 		taste: z.object({
 			fragrance: z.string().optional(),
 			aroma: z.string().optional(),
 			hot: z.string().optional(),
 			warm: z.string().optional(),
+			aftertaste: z.string().optional(),
+			mouthfeel: z.string().optional(),
 		}),
 		nextTime: z.string().optional(),
 	}),

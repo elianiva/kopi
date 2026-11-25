@@ -24,6 +24,9 @@ export const daysBetween = (from: Date, to: Date) =>
 export const ratio = (dose: number, water: number) =>
 	`1:${(water / dose).toFixed(1)}`;
 
+export const plural = (n: number, one: string, many = `${one}s`) =>
+	`${n} ${n === 1 ? one : many}`;
+
 /** Small stable number from a string, so each page gets its own stains and tilts. */
 export const seed = (s: string) => {
 	let h = 7;

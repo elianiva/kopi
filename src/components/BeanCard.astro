@@ -1,6 +1,6 @@
 ---
 import type { CollectionEntry } from "astro:content";
-import { seed } from "../lib/format";
+import { seed, plural } from "../lib/format";
 
 interface Props {
 	bean: CollectionEntry<"beans">;
@@ -28,7 +28,7 @@ const gates = Array.from({ length: Math.ceil(brews / 5) }, (_, i) =>
 			{d.country} · {d.process}
 		</span>
 		<span class="type meta">{d.tastingNotes.join(" · ")}</span>
-		<span class="tally" aria-label={`${brews} brews`}>
+		<span class="tally" aria-label={plural(brews, "brew")}>
 			{gates.map((n) => (
 				<span class:list={["gate", { full: n === 5 }]}>
 					{"|".repeat(Math.min(n, 4))}

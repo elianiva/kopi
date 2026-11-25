@@ -3,6 +3,7 @@ import Notebook from "../layouts/Notebook.astro";
 import BrewLine from "../components/BrewLine.astro";
 import BeanCard from "../components/BeanCard.astro";
 import { load } from "../lib/data";
+import { plural } from "../lib/format";
 
 const { roasteries, beans, brews, roasteryById, beanById, brewsOf, beansOf } =
 	await load();
@@ -15,9 +16,10 @@ const origins = [...Map.groupBy(beans, (b) => b.data.country)].sort(
 <Notebook title="Kopi">
 	<h1>Kopi</h1>
 	<p class="tally">
-		<span class="circled">{brews.length}</span> cups,{" "}
-		<span class="scribble">{beans.length} beans</span>
-		{` from ${roasteries.length} roasteries, ${origins.length} countries.`}
+		<span class="circled">{brews.length}</span>
+		{brews.length === 1 ? " cup" : " cups"},{" "}
+		<span class="scribble">{plural(beans.length, "bean")}</span>
+		{` from ${plural(roasteries.length, "roastery", "roasteries")}, ${plural(origins.length, "country", "countries")}.`}
 	</p>
 
 	<section>

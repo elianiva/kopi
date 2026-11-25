@@ -21,6 +21,8 @@ const tastes = [
 	["Aroma, wet", b.taste.aroma],
 	["Hot", b.taste.hot],
 	["Warm", b.taste.warm],
+	["Aftertaste", b.taste.aftertaste],
+	["Mouthfeel", b.taste.mouthfeel],
 ].filter(([, v]) => v) as [string, string][];
 const noteTilt = (seed(brew.id) % 5) - 1;
 ---
@@ -72,15 +74,26 @@ const noteTilt = (seed(brew.id) % 5) - 1;
 		))}
 	</ol>
 
-	<h2>Taste</h2>
-	<dl class="taste">
-		{tastes.map(([k, v]) => (
-			<div>
-				<dt class="type">{k}</dt>
-				<dd>{v}</dd>
-			</div>
-		))}
-	</dl>
+	{b.note && (
+		<>
+			<h2>Note</h2>
+			<p>{b.note}</p>
+		</>
+	)}
+
+	{tastes.length > 0 && (
+		<>
+			<h2>Taste</h2>
+			<dl class="taste">
+				{tastes.map(([k, v]) => (
+					<div>
+						<dt class="type">{k}</dt>
+						<dd>{v}</dd>
+					</div>
+				))}
+			</dl>
+		</>
+	)}
 
 	{b.nextTime && (
 		<aside class="sticky" style={`--r:${noteTilt}deg`}>
