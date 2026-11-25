@@ -1,0 +1,105 @@
+# Dummy data. Replace with real bags.
+- id: gayo-wine
+  name: Gayo Wine
+  roastery: tanah
+  country: Indonesia
+  region: Takengon, Aceh Tengah
+  producer: Koperasi Ketiara
+  process: Anaerobic natural
+  varieties: [Ateng, Tim Tim, Bourbon]
+  altitude: 1500
+  roastLevel: Medium-light
+  roastingMachine: Probat P12
+  roastDate: 2026-11-12
+  harvest: "2026"
+  weight: 200
+  tastingNotes: [Red grape, rum raisin, dark chocolate]
+
+- id: kintamani-honey
+  name: Kintamani Honey
+  roastery: pagi
+  country: Indonesia
+  region: Kintamani, Bali
+  producer: Subak Abian Kerta Waringin
+  process: Honey
+  varieties: [Kopyol, S795]
+  altitude: 1350
+  roastLevel: Light
+  roastingMachine: Loring S15
+  roastDate: 2026-11-03
+  weight: 150
+  tastingNotes: [Orange, brown sugar, jasmine]
+
+- id: hambela-wamena
+  name: Hambela Wamena
+  roastery: lereng
+  country: Ethiopia
+  region: Guji
+  producer: Hambela Wamena washing station
+  process: Natural
+  varieties: [Heirloom, "74158"]
+  altitude: 2100
+  roastLevel: Light
+  roastingMachine: Giesen W6
+  roastDate: 2026-10-27
+  harvest: 2025/26
+  weight: 200
+  tastingNotes: [Blueberry, bergamot, milk chocolate]
+
+- id: pitalito-pink-bourbon
+  name: Pitalito Pink Bourbon
+  roastery: lereng
+  country: Colombia
+  region: Pitalito, Huila
+  producer: Finca El Mirador
+  process: Washed
+  varieties: [Pink Bourbon]
+  altitude: 1750
+  roastLevel: Light
+  roastingMachine: Giesen W6
+  roastDate: 2026-10-20
+  weight: 100
+  tastingNotes: [Hibiscus, lime, panela]
+
+- id: toraja-sapan
+  name: Toraja Sapan
+  roastery: sela
+  country: Indonesia
+  region: Sapan, Toraja
+  process: Wet-hulled
+  varieties: [S795, Typica]
+  altitude: 1600
+  roastLevel: Medium
+  roastDate: 2026-10-08
+  weight: 100
+  tastingNotes: [Cedar, black tea, tamarind]
+
+- id: gichathaini
+  name: Gichathaini AA
+  roastery: pagi
+  country: Kenya
+  region: Nyeri
+  producer: Gichathaini Factory
+  process: Washed
+  varieties: [SL28, SL34]
+  altitude: 1800
+  roastLevel: Light
+  roastingMachine: Loring S15
+  roastDate: 2026-09-28
+  harvest: "2026"
+  weight: 100
+  tastingNotes: [Blackcurrant, tomato, grapefruit]
+
+- id: puntang-yeast
+  name: Puntang Yeast
+  roastery: hutan-kopi
+  country: Indonesia
+  region: Gunung Puntang, West Java
+  producer: Ayi Sutedja
+  process: Yeast natural
+  varieties: [Sigararutang, Lini S]
+  altitude: 1400
+  roastLevel: Medium-light
+  roastDate: 2026-09-15
+  weight: 100
+  tastingNotes: [Strawberry, yogurt, cacao nib]
