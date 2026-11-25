@@ -11,6 +11,8 @@ bun dev
 
 Entries live in `src/data/`: `roasteries.yaml`, `beans.yaml`, and `brews.yaml`. A bean references a roastery by `id`, and a brew references a bean.
 
+To log a brew, run `bun run brew`. It asks for each field, defaults to the last brew of the same bean, and appends the entry to `brews.yaml`.
+
 ## Deploy
 
 `alchemy.run.ts` declares the site as `Cloudflare.Website.Astro`. Every page is prerendered, so Cloudflare serves static assets only and no Worker code runs per request. Deploy state lives in your Cloudflare account through `Cloudflare.state()`, so local and CI deploys share it.
