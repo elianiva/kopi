@@ -6,22 +6,22 @@ import * as Output from "alchemy/Output";
 import * as Effect from "effect/Effect";
 import * as Layer from "effect/Layer";
 
-const domain = "kopi.elianiva.my.id";
+const domain = "kopi.elianiva.com";
 
 // Every page is prerendered, so this deploys static assets only: no Worker
 // code runs per request. Cloudflare serves dist/404.html for unknown paths.
-// Only prod gets the custom domain; previews stay on workers.dev.
+// Only prod gets the custom domain; previews stay on workers.dev. The old
+// my.id address redirects to it, path and query kept.
 export const Website = Cloudflare.Website.Astro(
 	"Website",
 	Effect.gen(function* () {
 		const prod = (yield* Stage) === "prod";
 		return {
-			astro: {
-				output: "static",
-				site: prod ? `https://${domain}` : undefined,
-			},
+			astro: { output: "static" },
 			assets: { notFoundHandling: "404-page" },
-			domain: prod ? domain : undefined,
+			domain: prod
+				? { name: domain, redirects: ["kopi.elianiva.my.id"] }
+				: undefined,
 		} as const;
 	}),
 );
