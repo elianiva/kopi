@@ -40,14 +40,12 @@ export default Alchemy.Stack(
 				},
 				{
 					effect: "allow",
-					// The kopi.elianiva.com custom domain (DNS record and
-					// certificate) and the redirect from kopi.elianiva.my.id.
+					// The kopi.elianiva.com custom domain: DNS record and certificate.
 					permissionGroups: [
 						"Zone Read",
 						"DNS Write",
 						"Workers Routes Write",
 						"SSL and Certificates Write",
-						"Dynamic URL Redirects Write",
 					],
 					resources: {
 						[`com.cloudflare.api.account.${accountId}`]: {
