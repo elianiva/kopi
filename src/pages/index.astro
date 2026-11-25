@@ -1,121 +1,16 @@
 ---
-import Layout from "../layouts/layout.astro";
-import Section from "../components/section.astro";
-import RecipeCard from "../components/recipe-card.astro";
-import BeanCard from "../components/bean-card.astro";
-import RatioStat from "../components/ratio-stat.astro";
-import BrewerCard from "../components/brewer-card.astro";
-import { getCollection, type CollectionEntry } from "astro:content";
-import { SearchBar } from "../components/search-bar";
-
-const allRecipes = await getCollection("recipes");
-const allBrewers = await getCollection("brewers");
-
-const recentRecipes = allRecipes
-	.filter((recipe: CollectionEntry<"recipes">) => recipe.data.featured)
-	.slice(0, 3)
-	.map((recipe: CollectionEntry<"recipes">) => ({
-		id: recipe.id,
-		title: recipe.data.title,
-		description: recipe.data.description,
-		tags: recipe.data.tags,
-	}));
-
-const topBrewers = allBrewers
-	.filter((brewer: CollectionEntry<"brewers">) => brewer.data.featured)
-	.slice(0, 6)
-	.map((brewer: CollectionEntry<"brewers">) => ({
-		name: brewer.data.name,
-		location: brewer.data.location,
-	}));
-
-const brewRatios = allRecipes
-	.filter(
-		(recipe: CollectionEntry<"recipes">) =>
-			recipe.data.ratio && recipe.data.dose && recipe.data.yield,
-	)
-	.slice(0, 3)
-	.map((recipe: CollectionEntry<"recipes">) => ({
-		method: recipe.data.method,
-		ratio: recipe.data.ratio,
-		dose: recipe.data.dose,
-		yield: recipe.data.yield,
-	}));
-
-const brewerRecipes = allRecipes
-	.slice(0, 12)
-	.map((recipe: CollectionEntry<"recipes">, idx: number) => ({
-		brewer: topBrewers[idx % topBrewers.length]?.name || "Featured Brewer",
-		title: recipe.data.title,
-		description: recipe.data.description,
-		tags: recipe.data.tags,
-	}));
 ---
 
-<Layout>
-	<section class="grid gap-10">
-		<header class="text-center grid gap-4 pt-6">
-			<h1
-				class="text-2xl md:text-4xl font-semibold leading-relaxed text-rose-pine-love font-mono"
-			>
-				KOPI.DIRECTORY
-			</h1>
-			<p class="mx-auto max-w-2xl text-rose-pine-subtle font-mono">
-				Explore and share coffee recipes, and follow the latest brew
-				guides in one place.
-			</p>
-			<SearchBar client:visible />
-		</header>
-
-		<Section id="brewers" title="Top brewers" href="/brewers">
-			{
-				topBrewers.map((brewer: any) => (
-					<BrewerCard name={brewer.name} location={brewer.location} />
-				))
-			}
-		</Section>
-
-		<Section id="recent" title="Recent recipes" href="/recipes">
-			{
-				recentRecipes.map((recipe: any) => (
-					<RecipeCard
-						id={recipe.id}
-						title={recipe.title}
-						description={recipe.description}
-						tags={recipe.tags}
-					/>
-				))
-			}
-		</Section>
-
-		<Section id="guides" title="Quick brew ratios" href="/guides">
-			{
-				brewRatios.map((item: any) => (
-					<RatioStat
-						method={item.method}
-						ratio={item.ratio}
-						dose={item.dose}
-						yield={item.yield}
-					/>
-				))
-			}
-		</Section>
-
-		<Section
-			id="brewer-recipes"
-			title="Brewer recipes"
-			href="/brewer-recipes"
-		>
-			{
-				brewerRecipes.map((recipe: any) => (
-					<RecipeCard
-						title={recipe.title}
-						description={recipe.description}
-						tags={recipe.tags}
-						meta={recipe.brewer}
-					/>
-				))
-			}
-		</Section>
-	</section>
-</Layout>
+<html lang="en">
+	<head>
+		<meta charset="utf-8" />
+		<link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+		<link rel="icon" href="/favicon.ico" />
+		<meta name="viewport" content="width=device-width" />
+		<meta name="generator" content={Astro.generator} />
+		<title>Astro</title>
+	</head>
+	<body>
+		<h1>Astro</h1>
+	</body>
+</html>
